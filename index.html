@@ -50,11 +50,26 @@
         }
         
         /* Status-specific colors */
-        .status-off-campus { background: linear-gradient(135deg, var(--off-campus), #ff8787); color: white; }
-        .status-on-campus { background: linear-gradient(135deg, var(--on-campus), #69db7c); color: white; }
-        .status-specific-location { background: linear-gradient(135deg, var(--specific-location), #4dabf7); color: white; }
-        .status-meeting { background: linear-gradient(135deg, var(--meeting), #ffd43b); color: var(--dark); }
-        .status-gone { background: linear-gradient(135deg, var(--gone), #adb5bd); color: white; }
+        .status-off-campus { 
+            background: linear-gradient(135deg, var(--off-campus), #ff8787); 
+            color: white; 
+        }
+        .status-on-campus { 
+            background: linear-gradient(135deg, var(--on-campus), #69db7c); 
+            color: white; 
+        }
+        .status-specific-location { 
+            background: linear-gradient(135deg, var(--specific-location), #4dabf7); 
+            color: white; 
+        }
+        .status-meeting { 
+            background: linear-gradient(135deg, var(--meeting), #ffd43b); 
+            color: var(--dark); 
+        }
+        .status-gone { 
+            background: linear-gradient(135deg, var(--gone), #adb5bd); 
+            color: white; 
+        }
         
         .status-icon {
             font-size: 3rem;
@@ -189,6 +204,39 @@
             flex-direction: column;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Beautiful contrasting backgrounds for each option */
+        .status-option[data-status="off-campus"] {
+            background: linear-gradient(135deg, #fff5f5, #ffebeb);
+            color: #ff6b6b;
+            border: 1px solid #ffc9c9;
+        }
+        
+        .status-option[data-status="on-campus"] {
+            background: linear-gradient(135deg, #ebfbee, #d3f9d8);
+            color: #2b8a3e;
+            border: 1px solid #b2f2bb;
+        }
+        
+        .status-option[data-status="specific-location"] {
+            background: linear-gradient(135deg, #e7f5ff, #d0ebff);
+            color: #1971c2;
+            border: 1px solid #a5d8ff;
+        }
+        
+        .status-option[data-status="meeting"] {
+            background: linear-gradient(135deg, #fff9db, #fff3bf);
+            color: #e67700;
+            border: 1px solid #ffec99;
+        }
+        
+        .status-option[data-status="gone"] {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #495057;
+            border: 1px solid #dee2e6;
         }
         
         .status-option:hover {
@@ -200,6 +248,13 @@
             font-size: 1.5rem;
             margin-bottom: 8px;
         }
+        
+        /* Status option icons with matching colors */
+        .status-option[data-status="off-campus"] i { color: #ff6b6b; }
+        .status-option[data-status="on-campus"] i { color: #51cf66; }
+        .status-option[data-status="specific-location"] i { color: #339af0; }
+        .status-option[data-status="meeting"] i { color: #fcc419; }
+        .status-option[data-status="gone"] i { color: #868e96; }
         
         /* Animations */
         @keyframes fadeIn {
@@ -313,7 +368,7 @@
         
         const STATUS_CONFIG = {
             'off-campus': {
-                message: "I'm currently off campus but will return later today.",
+                message: "I'm currently off campus.",
                 icon: "fa-home"
             },
             'on-campus': {
@@ -325,7 +380,7 @@
                 icon: "fa-map-marker-alt"
             },
             'meeting': {
-                message: "I'm in a meeting",
+                message: "I'm in a meeting.",
                 icon: "fa-users"
             },
             'gone': {
