@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        
+        .container {
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .on-campus {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .off-campus {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        h1 {
+            margin-top: 0;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            background-color: white;
+        }
+        
+        .on-campus button {
+            color: #4CAF50;
+        }
+        
+        .off-campus button {
+            color: #f44336;
+        }
+        
+        .last-updated {
+            font-size: 0.8rem;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+        
+        .password-form {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .error {
+            color: #ffeb3b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="statusContainer">
+        <h1 id="statusText">Loading status...</h1>
+        <p id="statusMessage"></p>
+        <button id="toggleButton">Change Status</button>
+        <div class="password-form" id="passwordForm">
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <p class="error" id="errorMessage"></p>
+            <button id="submitPassword">Submit</button>
+            <button id="cancelPassword">Cancel</button>
+        </div>
+        <p class="last-updated" id="lastUpdated"></p>
+    </div>
+
+    <script>
+        // Configuration - CHANGE THIS PASSWORD TO YOUR OWN
+        const PASSWORD = "03864533a"; // Replace with your own password
+        
+        // Check if status exists in localStorage, otherwise set default
+        if (!localStorage.getItem('campusStatus')) {
+            localStorage.setItem('campusStatus', 'off');
+            localStorage.setItem('lastUpdated', new Date().toLocaleString());
+        }
+
+        // DOM elements
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const statusMessage = document.getElementById('statusMessage');
+        const toggleButton = document.getElementById('toggleButton');
+        const lastUpdated = document.getElementById('lastUpdated');
+        const passwordForm = document.getElementById('passwordForm');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const submitPassword = document.getElementById('submitPassword');
+        const cancelPassword = document.getElementById('cancelPassword');
+
+        // Update the display based on current status
+        function updateDisplay() {
+            const status = localStorage.getItem('campusStatus');
+            const timestamp = localStorage.getItem('lastUpdated');
+            
+            if (status === 'on') {
+                statusContainer.className = 'container on-campus';
+                statusText.textContent = 'Currently: ON CAMPUS';
+                statusMessage.textContent = 'I am available on campus right now.';
+            } else {
+                statusContainer.className = 'container off-campus';
+                statusText.textContent = 'Currently: OFF CAMPUS';
+                statusMessage.textContent = 'I am not on campus at the moment.';
+            }
+            
+            lastUpdated.textContent = `Last updated: ${timestamp}`;
+        }
+
+        // Show password form
+        toggleButton.addEventListener('click', function() {
+            passwordForm.style.display = 'block';
+            toggleButton.style.display = 'none';
+            passwordInput.focus();
+        });
+
+        // Cancel password entry
+        cancelPassword.addEventListener('click', function() {
+            passwordForm.style.display = 'none';
+            toggleButton.style.display = 'inline-block';
+            errorMessage.textContent = '';
+            passwordInput.value = '';
+        });
+
+        // Submit password
+        submitPassword.addEventListener('click', function() {
+            if (passwordInput.value === PASSWORD) {
+                // Password correct - toggle status
+                const currentStatus = localStorage.getItem('campusStatus');
+                const newStatus = currentStatus === 'on' ? 'off' : 'on';
+                
+                localStorage.setItem('campusStatus', newStatus);
+                localStorage.setItem('lastUpdated', new Date().toLocaleString());
+                
+                // Reset form
+                passwordForm.style.display = 'none';
+                toggleButton.style.display = 'inline-block';
+                errorMessage.textContent = '';
+                passwordInput.value = '';
+                
+                updateDisplay();
+            } else {
+                errorMessage.textContent = 'Incorrect password';
+            }
+        });
+
+        // Also allow submitting with Enter key
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitPassword.click();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
