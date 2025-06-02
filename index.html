@@ -4,144 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Campus Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --off-campus: #ff6b6b;
+            --on-campus: #51cf66;
+            --specific-location: #339af0;
+            --meeting: #fcc419;
+            --gone: #868e96;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background-color: #f8f9fa;
-            text-align: center;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
         }
         
         .container {
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
             max-width: 500px;
-            width: 90%;
-            transition: background-color 0.3s;
+            margin: 2rem;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            background: white;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
         
         /* Status-specific colors */
-        .status-off-campus { background-color: #ff6b6b; color: white; }
-        .status-on-campus { background-color: #51cf66; color: white; }
-        .status-meeting { background-color: #fcc419; color: black; }
-        .status-gone { background-color: #868e96; color: white; }
-        .status-specific-location { background-color: #339af0; color: white; }
+        .status-off-campus { background: linear-gradient(135deg, var(--off-campus), #ff8787); color: white; }
+        .status-on-campus { background: linear-gradient(135deg, var(--on-campus), #69db7c); color: white; }
+        .status-specific-location { background: linear-gradient(135deg, var(--specific-location), #4dabf7); color: white; }
+        .status-meeting { background: linear-gradient(135deg, var(--meeting), #ffd43b); color: var(--dark); }
+        .status-gone { background: linear-gradient(135deg, var(--gone), #adb5bd); color: white; }
+        
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
         
         h1 {
-            margin-top: 0;
             font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
         
         .status-message {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin: 1rem 0;
+            opacity: 0.9;
         }
         
-        button {
-            padding: 10px 20px;
+        .change-btn {
+            padding: 12px 24px;
             font-size: 1rem;
+            font-weight: 500;
             border: none;
-            border-radius: 6px;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 0.5rem;
-            background-color: white;
-            transition: transform 0.2s;
+            margin: 1rem 0;
+            background: white;
+            color: var(--dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        button:hover {
-            transform: scale(1.05);
+        .change-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
         
         .last-updated {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             margin-top: 1.5rem;
-            opacity: 0.8;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         
+        /* Password Form */
         .password-form {
             margin-top: 1.5rem;
             display: none;
+            animation: slideUp 0.4s ease;
+        }
+        
+        .input-group {
+            position: relative;
+            margin: 1rem 0;
         }
         
         input {
-            padding: 10px;
-            margin: 0.5rem 0;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            width: 80%;
-            max-width: 250px;
+            padding: 12px 16px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--specific-location);
+            box-shadow: 0 0 0 3px rgba(51, 154, 240, 0.2);
         }
         
         .error {
             color: #ffec99;
             font-size: 0.9rem;
             margin: 0.5rem 0;
+            text-align: center;
         }
         
-        .status-options {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
+        .btn-group {
+            display: flex;
+            gap: 10px;
             margin-top: 1rem;
         }
         
-        .status-btn {
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: var(--specific-location);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f1f3f5;
+            color: var(--dark);
+        }
+        
+        /* Status Options */
+        .status-options {
+            display: none;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1.5rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .status-option {
+            flex: 1 1 45%;
             min-width: 120px;
-            margin: 0.3rem;
+            padding: 12px;
+            border-radius: 8px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .status-option i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+                border-radius: 12px;
+            }
+            
+            .status-option {
+                flex: 1 1 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container" id="statusContainer">
-        <h1 id="statusText">My Current Status</h1>
+        <div class="status-icon" id="statusIcon">
+            <i class="fas fa-home"></i>
+        </div>
+        <h1 id="statusText">Loading status...</h1>
         <div class="status-message" id="statusMessage"></div>
         
-        <button id="changeStatusBtn">Change My Status</button>
+        <button class="change-btn" id="changeStatusBtn">
+            <i class="fas fa-sync-alt"></i> Change Status
+        </button>
         
         <div class="password-form" id="passwordForm">
-            <input type="password" id="passwordInput" placeholder="Enter password">
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="Enter your password">
+            </div>
             <p class="error" id="errorMessage"></p>
-            <button id="submitPassword">Submit</button>
-            <button id="cancelPassword">Cancel</button>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="submitPassword">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+                <button class="btn btn-secondary" id="cancelPassword">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
         </div>
         
         <div class="status-options" id="statusOptions">
-            <button class="status-btn" data-status="off-campus">Off Campus</button>
-            <button class="status-btn" data-status="on-campus">On Campus (General)</button>
-            <button class="status-btn" data-status="specific-location">Somewhere on Campus</button>
-            <button class="status-btn" data-status="meeting">In a Meeting</button>
-            <button class="status-btn" data-status="gone">Gone for the Day</button>
+            <button class="status-option" data-status="off-campus">
+                <i class="fas fa-home"></i>
+                Off Campus
+            </button>
+            <button class="status-option" data-status="on-campus">
+                <i class="fas fa-university"></i>
+                On Campus
+            </button>
+            <button class="status-option" data-status="specific-location">
+                <i class="fas fa-map-marker-alt"></i>
+                Somewhere on Campus
+            </button>
+            <button class="status-option" data-status="meeting">
+                <i class="fas fa-users"></i>
+                In a Meeting
+            </button>
+            <button class="status-option" data-status="gone">
+                <i class="fas fa-moon"></i>
+                Gone for the Day
+            </button>
         </div>
         
-        <p class="last-updated" id="lastUpdated"></p>
+        <p class="last-updated">
+            <i class="far fa-clock"></i>
+            <span id="lastUpdated"></span>
+        </p>
     </div>
 
-    <script>
-        // Configuration - CHANGE THIS PASSWORD TO YOUR OWN
-        const PASSWORD = "03864533a"; // Replace with your own password
-        
-        // Status messages
-        const STATUS_MESSAGES = {
-            'off-campus': "I'm currently off campus and will return later",
-            'on-campus': "I'm on campus and in my office (T12).",
-            'specific-location': "I'm somewhere on campus (Will be back in office shortly).",
-            'meeting': "I'm in a meeting",
-            'gone': "I've left campus for the day."
-        };
-        
-        // Initialize default status if none exists
-        if (!localStorage.getItem('campusStatus')) {
-            localStorage.setItem('campusStatus', 'off-campus');
-            localStorage.setItem('lastUpdated', new Date().toLocaleString());
-        }
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
-        // DOM elements
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyARjXydNcfJ_fPA6E1ehiITh71X3r_vQzI",
+            authDomain: "campus-status-tracker.firebaseapp.com",
+            databaseURL: "https://campus-status-tracker-default-rtdb.firebaseio.com",
+            projectId: "campus-status-tracker",
+            storageBucket: "campus-status-tracker.firebasestorage.app",
+            messagingSenderId: "751946455362",
+            appId: "1:751946455362:web:64bb718d4f86a28a9ed0db"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // === App Configuration ===
+        const PASSWORD = "03864533a"; // Change to your password
+        
+        const STATUS_CONFIG = {
+            'off-campus': {
+                message: "I'm currently off campus but will return later today.",
+                icon: "fa-home"
+            },
+            'on-campus': {
+                message: "I'm on campus and available in cottage 12.",
+                icon: "fa-university"
+            },
+            'specific-location': {
+                message: "I'm somewhere on campus.",
+                icon: "fa-map-marker-alt"
+            },
+            'meeting': {
+                message: "I'm in a meeting",
+                icon: "fa-users"
+            },
+            'gone': {
+                message: "I've left SERE for the day.",
+                icon: "fa-moon"
+            }
+        };
+
+        // === DOM Elements ===
         const statusContainer = document.getElementById('statusContainer');
+        const statusIcon = document.getElementById('statusIcon');
         const statusText = document.getElementById('statusText');
         const statusMessage = document.getElementById('statusMessage');
         const changeStatusBtn = document.getElementById('changeStatusBtn');
@@ -153,36 +348,56 @@
         const cancelPassword = document.getElementById('cancelPassword');
         const statusOptions = document.getElementById('statusOptions');
 
-        // Update the display based on current status
-        function updateDisplay() {
-            const status = localStorage.getItem('campusStatus');
-            const timestamp = localStorage.getItem('lastUpdated');
-            
-            // Update container class and content
-            statusContainer.className = `container status-${status}`;
-            statusText.textContent = `Status: ${formatStatusText(status)}`;
-            statusMessage.textContent = STATUS_MESSAGES[status] || '';
-            
-            lastUpdated.textContent = `Last updated: ${timestamp}`;
+        // === Firebase Functions ===
+        function saveStatus(status) {
+            set(ref(database, 'status'), {
+                currentStatus: status,
+                lastUpdated: new Date().toLocaleString()
+            });
         }
 
-        // Format status text for display
+        function loadStatus() {
+            const statusRef = ref(database, 'status');
+            onValue(statusRef, (snapshot) => {
+                const data = snapshot.val() || { 
+                    currentStatus: 'off-campus', 
+                    lastUpdated: new Date().toLocaleString() 
+                };
+                updateDisplay(data);
+            });
+        }
+
+        // === Display Functions ===
+        function updateDisplay(data) {
+            const status = data.currentStatus;
+            const config = STATUS_CONFIG[status];
+            
+            // Update container class
+            statusContainer.className = `container status-${status}`;
+            
+            // Update icon
+            statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
+            
+            // Update text
+            statusText.textContent = `${formatStatusText(status)}`;
+            statusMessage.textContent = config.message;
+            lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
+        }
+
         function formatStatusText(status) {
-            const formatted = status.replace('-', ' ');
-            return formatted.split(' ').map(word => 
+            return status.split('-').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         }
 
-        // Show password form
-        changeStatusBtn.addEventListener('click', function() {
+        // === Event Listeners ===
+        changeStatusBtn.addEventListener('click', () => {
             passwordForm.style.display = 'block';
             changeStatusBtn.style.display = 'none';
             passwordInput.focus();
         });
 
-        // Cancel password entry
-        cancelPassword.addEventListener('click', function() {
+        cancelPassword.addEventListener('click', () => {
             passwordForm.style.display = 'none';
             statusOptions.style.display = 'none';
             changeStatusBtn.style.display = 'inline-block';
@@ -190,43 +405,33 @@
             passwordInput.value = '';
         });
 
-        // Submit password
-        submitPassword.addEventListener('click', function() {
+        submitPassword.addEventListener('click', () => {
             if (passwordInput.value === PASSWORD) {
-                // Password correct - show status options
                 passwordForm.style.display = 'none';
                 statusOptions.style.display = 'flex';
                 errorMessage.textContent = '';
                 passwordInput.value = '';
             } else {
-                errorMessage.textContent = 'Incorrect password';
+                errorMessage.textContent = 'Incorrect password. Please try again.';
+                passwordInput.focus();
             }
         });
 
-        // Handle status selection
-        document.querySelectorAll('.status-btn').forEach(btn => {
+        document.querySelectorAll('.status-option').forEach(btn => {
             btn.addEventListener('click', function() {
                 const newStatus = this.getAttribute('data-status');
-                localStorage.setItem('campusStatus', newStatus);
-                localStorage.setItem('lastUpdated', new Date().toLocaleString());
-                
-                // Reset UI
+                saveStatus(newStatus);
                 statusOptions.style.display = 'none';
                 changeStatusBtn.style.display = 'inline-block';
-                
-                updateDisplay();
             });
         });
 
-        // Allow submitting with Enter key
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitPassword.click();
-            }
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitPassword.click();
         });
 
-        // Initialize display
-        updateDisplay();
+        // === Initialize ===
+        loadStatus();
     </script>
 </body>
 </html>
