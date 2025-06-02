@@ -364,7 +364,7 @@
         const database = getDatabase(app);
 
         // === App Configuration ===
-        const PASSWORD = "sere@1"; // Change to your password
+        const PASSWORD = "mySecurePassword123"; // Change to your password
         
         const STATUS_CONFIG = {
             'off-campus': {
@@ -372,19 +372,19 @@
                 icon: "fa-home"
             },
             'on-campus': {
-                message: "I'm on campus and available in cottage 12.",
+                message: "I'm on campus and available.",
                 icon: "fa-university"
             },
             'specific-location': {
-                message: "I'm somewhere on campus.",
+                message: "I'm somewhere on campus (ask for details).",
                 icon: "fa-map-marker-alt"
             },
             'meeting': {
-                message: "I'm in a meeting.",
+                message: "I'm in a meeting - please don't disturb.",
                 icon: "fa-users"
             },
             'gone': {
-                message: "I've left SERE for the day.",
+                message: "I've left for the day.",
                 icon: "fa-moon"
             }
         };
@@ -396,8 +396,8 @@
         const statusMessage = document.getElementById('statusMessage');
         const changeStatusBtn = document.getElementById('changeStatusBtn');
         const lastUpdated = document.getElementById('lastUpdated');
-        const Form = document.getElementById('Form');
-        const Input = document.getElementById('Input');
+        const passwordForm = document.getElementById('passwordForm');
+        const passwordInput = document.getElementById('passwordInput');
         const errorMessage = document.getElementById('errorMessage');
         const submitPassword = document.getElementById('submitPassword');
         const cancelPassword = document.getElementById('cancelPassword');
