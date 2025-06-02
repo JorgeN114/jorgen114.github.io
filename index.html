@@ -221,7 +221,7 @@
             border: 1px solid #b2f2bb;
         }
         
-        .status-option[data-status="On campus"] {
+        .status-option[data-status="specific-location"] {
             background: linear-gradient(135deg, #e7f5ff, #d0ebff);
             color: #1971c2;
             border: 1px solid #a5d8ff;
@@ -323,7 +323,7 @@
                 <i class="fas fa-university"></i>
                 On Campus
             </button>
-            <button class="status-option" data-status="On Campus">
+            <button class="status-option" data-status="specific-location">
                 <i class="fas fa-map-marker-alt"></i>
                 Somewhere on Campus
             </button>
@@ -364,7 +364,7 @@
         const database = getDatabase(app);
 
         // === App Configuration ===
-        const PASSWORD = "03864533a"; // Change to your password
+        const PASSWORD = "sere@1"; // Change to your password
         
         const STATUS_CONFIG = {
             'off-campus': {
@@ -396,8 +396,8 @@
         const statusMessage = document.getElementById('statusMessage');
         const changeStatusBtn = document.getElementById('changeStatusBtn');
         const lastUpdated = document.getElementById('lastUpdated');
-        const passwordForm = document.getElementById('passwordForm');
-        const passwordInput = document.getElementById('passwordInput');
+        const Form = document.getElementById('Form');
+        const Input = document.getElementById('Input');
         const errorMessage = document.getElementById('errorMessage');
         const submitPassword = document.getElementById('submitPassword');
         const cancelPassword = document.getElementById('cancelPassword');
