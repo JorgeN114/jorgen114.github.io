@@ -1,154 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- [Keep all your existing CSS and meta tags] -->
-    <style>
-        /* [Keep all your existing styles] */
-        
-        /* Add login form styles */
-        .login-form {
-            margin-top: 1.5rem;
-            animation: slideUp 0.4s ease;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 1rem;
-        }
-        
-        .logout-btn {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-    </style>
-</head>
-<body>
-    <div class="container" id="statusContainer">
-        <div class="status-icon" id="statusIcon">
-            <i class="fas fa-home"></i>
-        </div>
-        <h1 id="statusText">Loading status...</h1>
-        <div class="status-message" id="statusMessage"></div>
-        
-        <div id="authSection">
-            <div class="login-form" id="loginForm">
-                <div class="input-group">
-                    <input type="email" id="emailInput" placeholder="Your email">
-                </div>
-                <div class="input-group">
-                    <input type="password" id="loginPassword" placeholder="Your password">
-                </div>
-                <p class="error" id="loginError"></p>
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="loginBtn">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                </div>
-            </div>
-            
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span id="userEmail"></span>
-                <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </div>
-        
-        <button class="change-btn" id="changeStatusBtn" style="display: none;">
-            <i class="fas fa-sync-alt"></i> Change Status
-        </button>
-        
-        <div class="status-options" id="statusOptions">
-            <!-- [Keep your existing status options] -->
-        </div>
-        
-        <p class="last-updated">
-            <i class="far fa-clock"></i>
-            <span id="lastUpdated"></span>
-        </p>
-    </div>
+<!-- [Previous HTML and CSS remains exactly the same] -->
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { 
-            getDatabase, 
-            ref, 
-            set, 
-            onValue 
-        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
-        import {
-            getAuth,
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { 
+        getDatabase, 
+        ref, 
+        set, 
+        onValue 
+    } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyARjXydNcfJ_fPA6E1ehiITh71X3r_vQzI",
-            authDomain: "campus-status-tracker.firebaseapp.com",
-            databaseURL: "https://campus-status-tracker-default-rtdb.firebaseio.com",
-            projectId: "campus-status-tracker",
-            storageBucket: "campus-status-tracker.firebasestorage.app",
-            messagingSenderId: "751946455362",
-            appId: "1:751946455362:web:64bb718d4f86a28a9ed0db"
-        };
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyARjXydNcfJ_fPA6E1ehiITh71X3r_vQzI",
+        authDomain: "campus-status-tracker.firebaseapp.com",
+        databaseURL: "https://campus-status-tracker-default-rtdb.firebaseio.com",
+        projectId: "campus-status-tracker",
+        storageBucket: "campus-status-tracker.firebasestorage.app",
+        messagingSenderId: "751946455362",
+        appId: "1:751946455362:web:64bb718d4f86a28a9ed0db"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const auth = getAuth(app);
 
-        // [Keep your existing STATUS_CONFIG and DOM elements]
-        // Add new DOM elements for auth:
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const emailInput = document.getElementById('emailInput');
-        const loginPassword = document.getElementById('loginPassword');
-        const loginError = document.getElementById('loginError');
-        const userInfo = document.getElementById('userInfo');
-        const userEmail = document.getElementById('userEmail');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const authSection = document.getElementById('authSection');
+    // [Keep your existing STATUS_CONFIG and DOM elements]
 
-        // Authentication state handler
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in
-                loginForm.style.display = 'none';
-                userInfo.style.display = 'flex';
-                changeStatusBtn.style.display = 'inline-block';
-                userEmail.textContent = user.email;
-            } else {
-                // User is signed out
-                loginForm.style.display = 'block';
-                userInfo.style.display = 'none';
-                changeStatusBtn.style.display = 'none';
-                statusOptions.style.display = 'none';
+    // Enhanced login handler with better error messages
+    loginBtn.addEventListener('click', async () => {
+        loginError.textContent = ''; // Clear previous errors
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+        
+        try {
+            await signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value);
+        } catch (error) {
+            let errorMessage;
+            switch (error.code) {
+                case 'auth/operation-not-allowed':
+                    errorMessage = "Email/password login is not enabled. Please contact the administrator.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "Invalid email address format.";
+                    break;
+                case 'auth/user-disabled':
+                    errorMessage = "This account has been disabled.";
+                    break;
+                case 'auth/user-not-found':
+                    errorMessage = "No account found with this email.";
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = "Incorrect password.";
+                    break;
+                default:
+                    errorMessage = "Login failed. Please try again.";
+                    console.error(error);
             }
-        });
+            loginError.textContent = errorMessage;
+            loginPassword.value = '';
+            loginPassword.focus();
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        }
+    });
 
-        // Login handler
-        loginBtn.addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value)
-                .catch((error) => {
-                    loginError.textContent = error.message;
-                });
-        });
-
-        // Logout handler
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        // [Keep all your existing display and status functions]
-        
-        // Initialize
-        loadStatus();
-    </script>
-</body>
-</html>
+    // [Rest of your existing JavaScript code]
+</script>
