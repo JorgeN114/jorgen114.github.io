@@ -121,9 +121,10 @@
             gap: 6px;
         }
         
-        /* Login Form */
+        /* Login Form (initially hidden) */
         .login-form {
             margin-top: 1.5rem;
+            display: none; /* Hidden by default */
             animation: slideUp 0.4s ease;
         }
         
@@ -260,7 +261,7 @@
         
         /* User info section */
         .user-info {
-            display: flex;
+            display: none; /* Hidden by default */
             align-items: center;
             justify-content: center;
             gap: 10px;
@@ -318,8 +319,13 @@
         <h1 id="statusText">My Campus Status</h1>
         <div class="status-message" id="statusMessage">Loading...</div>
         
-        <!-- Login Section -->
-        <div id="authSection">
+        <!-- Change Status Button (always visible) -->
+        <button class="change-btn" id="changeStatusBtn">
+            <i class="fas fa-sync-alt"></i> Change Status
+        </button>
+        
+        <!-- Login Section (hidden until Change Status is clicked) -->
+        <div id="authSection" style="display: none;">
             <div class="login-form" id="loginForm">
                 <div class="input-group">
                     <input type="email" id="emailInput" placeholder="Your email" autocomplete="username">
@@ -332,10 +338,13 @@
                     <button class="btn btn-primary" id="loginBtn">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </button>
+                    <button class="btn btn-secondary" id="cancelLoginBtn">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
                 </div>
             </div>
             
-            <div class="user-info" id="userInfo" style="display: none;">
+            <div class="user-info" id="userInfo">
                 <span id="userEmail"></span>
                 <button class="logout-btn" id="logoutBtn">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -343,11 +352,8 @@
             </div>
         </div>
         
-        <button class="change-btn" id="changeStatusBtn" style="display: none;">
-            <i class="fas fa-sync-alt"></i> Change Status
-        </button>
-        
-        <div class="status-options" id="statusOptions" style="display: none;">
+        <!-- Status Options (shown after successful login) -->
+        <div class="status-options" id="statusOptions">
             <button class="status-option" data-status="off-campus">
                 <i class="fas fa-home"></i>
                 Off Campus
@@ -439,15 +445,16 @@
         const statusMessage = document.getElementById('statusMessage');
         const changeStatusBtn = document.getElementById('changeStatusBtn');
         const lastUpdated = document.getElementById('lastUpdated');
+        const authSection = document.getElementById('authSection');
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
+        const cancelLoginBtn = document.getElementById('cancelLoginBtn');
         const emailInput = document.getElementById('emailInput');
         const loginPassword = document.getElementById('loginPassword');
         const loginError = document.getElementById('loginError');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
         const logoutBtn = document.getElementById('logoutBtn');
-        const authSection = document.getElementById('authSection');
         const statusOptions = document.getElementById('statusOptions');
 
         // Update the display based on current status
@@ -497,37 +504,81 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in
-                loginForm.style.display = 'none';
                 userInfo.style.display = 'flex';
-                changeStatusBtn.style.display = 'inline-block';
                 userEmail.textContent = user.email;
-                statusOptions.style.display = 'none';
+                loginForm.style.display = 'none';
+                statusOptions.style.display = 'flex';
+                changeStatusBtn.style.display = 'none';
             } else {
                 // User is signed out
-                loginForm.style.display = 'block';
                 userInfo.style.display = 'none';
-                changeStatusBtn.style.display = 'none';
+                loginForm.style.display = 'none';
                 statusOptions.style.display = 'none';
+                changeStatusBtn.style.display = 'inline-block';
+                authSection.style.display = 'none';
             }
         });
 
+        // Change Status button click handler
+        changeStatusBtn.addEventListener('click', () => {
+            authSection.style.display = 'block';
+            loginForm.style.display = 'block';
+            changeStatusBtn.style.display = 'none';
+            emailInput.focus();
+        });
+
+        // Cancel login button
+        cancelLoginBtn.addEventListener('click', () => {
+            authSection.style.display = 'none';
+            loginForm.style.display = 'none';
+            changeStatusBtn.style.display = 'inline-block';
+            loginError.textContent = '';
+            emailInput.value = '';
+            loginPassword.value = '';
+        });
+
         // Login handler
-        loginBtn.addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value)
-                .catch((error) => {
-                    loginError.textContent = error.message;
-                });
+        loginBtn.addEventListener('click', async () => {
+            loginError.textContent = '';
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            
+            try {
+                await signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value);
+            } catch (error) {
+                let errorMessage;
+                switch (error.code) {
+                    case 'auth/operation-not-allowed':
+                        errorMessage = "Email/password login is not enabled. Please contact the administrator.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Invalid email address format.";
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = "This account has been disabled.";
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = "No account found with this email.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "Incorrect password.";
+                        break;
+                    default:
+                        errorMessage = "Login failed. Please try again.";
+                        console.error(error);
+                }
+                loginError.textContent = errorMessage;
+                loginPassword.value = '';
+                loginPassword.focus();
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
         });
 
         // Logout handler
         logoutBtn.addEventListener('click', () => {
             signOut(auth);
-        });
-
-        // Change status button handler
-        changeStatusBtn.addEventListener('click', () => {
-            statusOptions.style.display = 'flex';
-            changeStatusBtn.style.display = 'none';
         });
 
         // Status option handlers
@@ -536,6 +587,7 @@
                 const newStatus = this.getAttribute('data-status');
                 saveStatus(newStatus);
                 statusOptions.style.display = 'none';
+                authSection.style.display = 'none';
                 changeStatusBtn.style.display = 'inline-block';
             });
         });
