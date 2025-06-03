@@ -1,289 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Campus Status</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- [Keep all your existing CSS and meta tags] -->
     <style>
-        :root {
-            --off-campus: #ff6b6b;
-            --on-campus: #51cf66;
-            --specific-location: #339af0;
-            --meeting: #fcc419;
-            --gone: #868e96;
-            --dark: #2c3e50;
-            --light: #f8f9fa;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
+        /* [Keep all your existing styles] */
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f5f7fa;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 2rem;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            background: white;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Status-specific colors */
-        .status-off-campus { 
-            background: linear-gradient(135deg, var(--off-campus), #ff8787); 
-            color: white; 
-        }
-        .status-on-campus { 
-            background: linear-gradient(135deg, var(--on-campus), #69db7c); 
-            color: white; 
-        }
-        .status-specific-location { 
-            background: linear-gradient(135deg, var(--specific-location), #4dabf7); 
-            color: white; 
-        }
-        .status-meeting { 
-            background: linear-gradient(135deg, var(--meeting), #ffd43b); 
-            color: var(--dark); 
-        }
-        .status-gone { 
-            background: linear-gradient(135deg, var(--gone), #adb5bd); 
-            color: white; 
-        }
-        
-        .status-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .status-message {
-            font-size: 1.1rem;
-            margin: 1rem 0;
-            opacity: 0.9;
-        }
-        
-        .change-btn {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 500;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 1rem 0;
-            background: white;
-            color: var(--dark);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .change-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        
-        .last-updated {
-            font-size: 0.85rem;
+        /* Add login form styles */
+        .login-form {
             margin-top: 1.5rem;
-            opacity: 0.7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        /* Password Form */
-        .password-form {
-            margin-top: 1.5rem;
-            display: none;
             animation: slideUp 0.4s ease;
         }
         
-        .input-group {
-            position: relative;
-            margin: 1rem 0;
-        }
-        
-        input {
-            padding: 12px 16px;
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            font-family: inherit;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--specific-location);
-            box-shadow: 0 0 0 3px rgba(51, 154, 240, 0.2);
-        }
-        
-        .error {
-            color: #ffec99;
-            font-size: 0.9rem;
-            margin: 0.5rem 0;
-            text-align: center;
-        }
-        
-        .btn-group {
+        .user-info {
             display: flex;
+            align-items: center;
             gap: 10px;
             margin-top: 1rem;
         }
         
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
+        .logout-btn {
+            background: none;
             border: none;
-            font-weight: 500;
+            color: inherit;
             cursor: pointer;
-            transition: var(--transition);
-            flex: 1;
-        }
-        
-        .btn-primary {
-            background: var(--specific-location);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #f1f3f5;
-            color: var(--dark);
-        }
-        
-        /* Status Options */
-        .status-options {
-            display: none;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 1.5rem;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .status-option {
-            flex: 1 1 45%;
-            min-width: 120px;
-            padding: 12px;
-            border-radius: 8px;
-            background: white;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Beautiful contrasting backgrounds for each option */
-        .status-option[data-status="off-campus"] {
-            background: linear-gradient(135deg, #fff5f5, #ffebeb);
-            color: #ff6b6b;
-            border: 1px solid #ffc9c9;
-        }
-        
-        .status-option[data-status="on-campus"] {
-            background: linear-gradient(135deg, #ebfbee, #d3f9d8);
-            color: #2b8a3e;
-            border: 1px solid #b2f2bb;
-        }
-        
-        .status-option[data-status="specific-location"] {
-            background: linear-gradient(135deg, #e7f5ff, #d0ebff);
-            color: #1971c2;
-            border: 1px solid #a5d8ff;
-        }
-        
-        .status-option[data-status="meeting"] {
-            background: linear-gradient(135deg, #fff9db, #fff3bf);
-            color: #e67700;
-            border: 1px solid #ffec99;
-        }
-        
-        .status-option[data-status="gone"] {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: #495057;
-            border: 1px solid #dee2e6;
-        }
-        
-        .status-option:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .status-option i {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-        
-        /* Status option icons with matching colors */
-        .status-option[data-status="off-campus"] i { color: #ff6b6b; }
-        .status-option[data-status="on-campus"] i { color: #51cf66; }
-        .status-option[data-status="specific-location"] i { color: #339af0; }
-        .status-option[data-status="meeting"] i { color: #fcc419; }
-        .status-option[data-status="gone"] i { color: #868e96; }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container {
-                padding: 1.5rem;
-                margin: 1rem;
-                border-radius: 12px;
-            }
-            
-            .status-option {
-                flex: 1 1 100%;
-            }
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -295,46 +36,36 @@
         <h1 id="statusText">Loading status...</h1>
         <div class="status-message" id="statusMessage"></div>
         
-        <button class="change-btn" id="changeStatusBtn">
-            <i class="fas fa-sync-alt"></i> Change Status
-        </button>
-        
-        <div class="password-form" id="passwordForm">
-            <div class="input-group">
-                <input type="password" id="passwordInput" placeholder="Enter your password">
+        <div id="authSection">
+            <div class="login-form" id="loginForm">
+                <div class="input-group">
+                    <input type="email" id="emailInput" placeholder="Your email">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Your password">
+                </div>
+                <p class="error" id="loginError"></p>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
             </div>
-            <p class="error" id="errorMessage"></p>
-            <div class="btn-group">
-                <button class="btn btn-primary" id="submitPassword">
-                    <i class="fas fa-check"></i> Confirm
-                </button>
-                <button class="btn btn-secondary" id="cancelPassword">
-                    <i class="fas fa-times"></i> Cancel
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="userEmail"></span>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </div>
         
+        <button class="change-btn" id="changeStatusBtn" style="display: none;">
+            <i class="fas fa-sync-alt"></i> Change Status
+        </button>
+        
         <div class="status-options" id="statusOptions">
-            <button class="status-option" data-status="off-campus">
-                <i class="fas fa-home"></i>
-                Off Campus
-            </button>
-            <button class="status-option" data-status="on-campus">
-                <i class="fas fa-university"></i>
-                On Campus
-            </button>
-            <button class="status-option" data-status="specific-location">
-                <i class="fas fa-map-marker-alt"></i>
-                Somewhere on Campus
-            </button>
-            <button class="status-option" data-status="meeting">
-                <i class="fas fa-users"></i>
-                In a Meeting
-            </button>
-            <button class="status-option" data-status="gone">
-                <i class="fas fa-moon"></i>
-                Gone for the Day
-            </button>
+            <!-- [Keep your existing status options] -->
         </div>
         
         <p class="last-updated">
@@ -344,11 +75,20 @@
     </div>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            onValue 
+        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyARjXydNcfJ_fPA6E1ehiITh71X3r_vQzI",
             authDomain: "campus-status-tracker.firebaseapp.com",
@@ -359,133 +99,55 @@
             appId: "1:751946455362:web:64bb718d4f86a28a9ed0db"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        const auth = getAuth(app);
 
-        // === App Configuration ===
-        const PASSWORD = "sere5tatus"; // Change to your password
-        
-        const STATUS_CONFIG = {
-            'off-campus': {
-                message: "I'm currently off campus.",
-                icon: "fa-home"
-            },
-            'on-campus': {
-                message: "I'm on campus and available in cottage 12.",
-                icon: "fa-university"
-            },
-            'specific-location': {
-                message: "I'm somewhere on campus.",
-                icon: "fa-map-marker-alt"
-            },
-            'meeting': {
-                message: "I'm in a meeting.",
-                icon: "fa-users"
-            },
-            'gone': {
-                message: "I've left SERE for the day.",
-                icon: "fa-moon"
-            }
-        };
+        // [Keep your existing STATUS_CONFIG and DOM elements]
+        // Add new DOM elements for auth:
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const emailInput = document.getElementById('emailInput');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authSection = document.getElementById('authSection');
 
-        // === DOM Elements ===
-        const statusContainer = document.getElementById('statusContainer');
-        const statusIcon = document.getElementById('statusIcon');
-        const statusText = document.getElementById('statusText');
-        const statusMessage = document.getElementById('statusMessage');
-        const changeStatusBtn = document.getElementById('changeStatusBtn');
-        const lastUpdated = document.getElementById('lastUpdated');
-        const passwordForm = document.getElementById('passwordForm');
-        const passwordInput = document.getElementById('passwordInput');
-        const errorMessage = document.getElementById('errorMessage');
-        const submitPassword = document.getElementById('submitPassword');
-        const cancelPassword = document.getElementById('cancelPassword');
-        const statusOptions = document.getElementById('statusOptions');
-
-        // === Firebase Functions ===
-        function saveStatus(status) {
-            set(ref(database, 'status'), {
-                currentStatus: status,
-                lastUpdated: new Date().toLocaleString()
-            });
-        }
-
-        function loadStatus() {
-            const statusRef = ref(database, 'status');
-            onValue(statusRef, (snapshot) => {
-                const data = snapshot.val() || { 
-                    currentStatus: 'off-campus', 
-                    lastUpdated: new Date().toLocaleString() 
-                };
-                updateDisplay(data);
-            });
-        }
-
-        // === Display Functions ===
-        function updateDisplay(data) {
-            const status = data.currentStatus;
-            const config = STATUS_CONFIG[status];
-            
-            // Update container class
-            statusContainer.className = `container status-${status}`;
-            
-            // Update icon
-            statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
-            
-            // Update text
-            statusText.textContent = `${formatStatusText(status)}`;
-            statusMessage.textContent = config.message;
-            lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
-        }
-
-        function formatStatusText(status) {
-            return status.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-        }
-
-        // === Event Listeners ===
-        changeStatusBtn.addEventListener('click', () => {
-            passwordForm.style.display = 'block';
-            changeStatusBtn.style.display = 'none';
-            passwordInput.focus();
-        });
-
-        cancelPassword.addEventListener('click', () => {
-            passwordForm.style.display = 'none';
-            statusOptions.style.display = 'none';
-            changeStatusBtn.style.display = 'inline-block';
-            errorMessage.textContent = '';
-            passwordInput.value = '';
-        });
-
-        submitPassword.addEventListener('click', () => {
-            if (passwordInput.value === PASSWORD) {
-                passwordForm.style.display = 'none';
-                statusOptions.style.display = 'flex';
-                errorMessage.textContent = '';
-                passwordInput.value = '';
-            } else {
-                errorMessage.textContent = 'Incorrect password. Please try again.';
-                passwordInput.focus();
-            }
-        });
-
-        document.querySelectorAll('.status-option').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const newStatus = this.getAttribute('data-status');
-                saveStatus(newStatus);
-                statusOptions.style.display = 'none';
+        // Authentication state handler
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                loginForm.style.display = 'none';
+                userInfo.style.display = 'flex';
                 changeStatusBtn.style.display = 'inline-block';
-            });
+                userEmail.textContent = user.email;
+            } else {
+                // User is signed out
+                loginForm.style.display = 'block';
+                userInfo.style.display = 'none';
+                changeStatusBtn.style.display = 'none';
+                statusOptions.style.display = 'none';
+            }
         });
 
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') submitPassword.click();
+        // Login handler
+        loginBtn.addEventListener('click', () => {
+            signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value)
+                .catch((error) => {
+                    loginError.textContent = error.message;
+                });
         });
 
-        // === Initialize ===
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        // [Keep all your existing display and status functions]
+        
+        // Initialize
         loadStatus();
     </script>
 </body>
