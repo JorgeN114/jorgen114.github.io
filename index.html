@@ -121,10 +121,10 @@
             gap: 6px;
         }
         
-        /* Login Form (initially hidden) */
+        /* Login Form */
         .login-form {
             margin-top: 1.5rem;
-            display: none; /* Hidden by default */
+            display: none;
             animation: slideUp 0.4s ease;
         }
         
@@ -211,7 +211,7 @@
             overflow: hidden;
         }
         
-        /* Beautiful contrasting backgrounds for each option */
+        /* Status option styles */
         .status-option[data-status="off-campus"] {
             background: linear-gradient(135deg, #fff5f5, #ffebeb);
             color: #ff6b6b;
@@ -252,7 +252,7 @@
             margin-bottom: 8px;
         }
         
-        /* Status option icons with matching colors */
+        /* Status option icons */
         .status-option[data-status="off-campus"] i { color: #ff6b6b; }
         .status-option[data-status="on-campus"] i { color: #51cf66; }
         .status-option[data-status="specific-location"] i { color: #339af0; }
@@ -261,7 +261,7 @@
         
         /* User info section */
         .user-info {
-            display: none; /* Hidden by default */
+            display: none;
             align-items: center;
             justify-content: center;
             gap: 10px;
@@ -319,12 +319,10 @@
         <h1 id="statusText">My Campus Status</h1>
         <div class="status-message" id="statusMessage">Loading...</div>
         
-        <!-- Change Status Button (always visible) -->
         <button class="change-btn" id="changeStatusBtn">
             <i class="fas fa-sync-alt"></i> Change Status
         </button>
         
-        <!-- Login Section (hidden until Change Status is clicked) -->
         <div id="authSection" style="display: none;">
             <div class="login-form" id="loginForm">
                 <div class="input-group">
@@ -352,7 +350,6 @@
             </div>
         </div>
         
-        <!-- Status Options (shown after successful login) -->
         <div class="status-options" id="statusOptions">
             <button class="status-option" data-status="off-campus">
                 <i class="fas fa-home"></i>
@@ -383,7 +380,7 @@
     </div>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
         import { 
             getDatabase, 
@@ -398,7 +395,7 @@
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyARjXydNcfJ_fPA6E1ehiITh71X3r_vQzI",
             authDomain: "campus-status-tracker.firebaseapp.com",
@@ -462,18 +459,14 @@
             const status = data.currentStatus;
             const config = STATUS_CONFIG[status];
             
-            // Update container class
             statusContainer.className = `container status-${status}`;
-            
-            // Update icon
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
-            
-            // Update text
             statusText.textContent = `${formatStatusText(status)}`;
             statusMessage.textContent = config.message;
             lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
         }
 
+        // Format status text for display
         function formatStatusText(status) {
             return status.split('-').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
@@ -507,8 +500,8 @@
                 userInfo.style.display = 'flex';
                 userEmail.textContent = user.email;
                 loginForm.style.display = 'none';
-                statusOptions.style.display = 'flex';
-                changeStatusBtn.style.display = 'none';
+                authSection.style.display = 'none';
+                changeStatusBtn.style.display = 'inline-block';
             } else {
                 // User is signed out
                 userInfo.style.display = 'none';
@@ -521,10 +514,17 @@
 
         // Change Status button click handler
         changeStatusBtn.addEventListener('click', () => {
-            authSection.style.display = 'block';
-            loginForm.style.display = 'block';
-            changeStatusBtn.style.display = 'none';
-            emailInput.focus();
+            if (auth.currentUser) {
+                // User is already logged in - show status options directly
+                statusOptions.style.display = 'flex';
+                changeStatusBtn.style.display = 'none';
+            } else {
+                // User needs to log in
+                authSection.style.display = 'block';
+                loginForm.style.display = 'block';
+                changeStatusBtn.style.display = 'none';
+                emailInput.focus();
+            }
         });
 
         // Cancel login button
@@ -545,29 +545,12 @@
             
             try {
                 await signInWithEmailAndPassword(auth, emailInput.value, loginPassword.value);
+                // On successful login, show status options
+                statusOptions.style.display = 'flex';
+                authSection.style.display = 'none';
+                changeStatusBtn.style.display = 'none';
             } catch (error) {
-                let errorMessage;
-                switch (error.code) {
-                    case 'auth/operation-not-allowed':
-                        errorMessage = "Email/password login is not enabled. Please contact the administrator.";
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = "Invalid email address format.";
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = "This account has been disabled.";
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = "No account found with this email.";
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = "Incorrect password.";
-                        break;
-                    default:
-                        errorMessage = "Login failed. Please try again.";
-                        console.error(error);
-                }
-                loginError.textContent = errorMessage;
+                loginError.textContent = getErrorMessage(error.code);
                 loginPassword.value = '';
                 loginPassword.focus();
             } finally {
@@ -575,6 +558,19 @@
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
             }
         });
+
+        // Helper function for error messages
+        function getErrorMessage(errorCode) {
+            const messages = {
+                'auth/operation-not-allowed': 'Email/password login is not enabled',
+                'auth/invalid-email': 'Invalid email address',
+                'auth/user-disabled': 'Account disabled',
+                'auth/user-not-found': 'Account not found',
+                'auth/wrong-password': 'Incorrect password',
+                'default': 'Login failed. Please try again.'
+            };
+            return messages[errorCode] || messages['default'];
+        }
 
         // Logout handler
         logoutBtn.addEventListener('click', () => {
@@ -587,7 +583,6 @@
                 const newStatus = this.getAttribute('data-status');
                 saveStatus(newStatus);
                 statusOptions.style.display = 'none';
-                authSection.style.display = 'none';
                 changeStatusBtn.style.display = 'inline-block';
             });
         });
