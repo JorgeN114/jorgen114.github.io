@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Initial logo hiding to prevent flash */
+        .logo {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 0.3s, opacity 0.3s ease;
+        }
+        .status-loaded .logo {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+    <style>
         :root {
             --off-campus: #ff6b6b;
             --on-campus: #51cf66;
@@ -47,6 +59,30 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+        }
+
+        /* Logo Styles */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            height: 80px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            transition: var(--transition);
+            filter: none !important; /* Force no filter by default */
+        }
+
+        /* White logo only on dark backgrounds */
+        .status-off-campus .logo,
+        .status-on-campus .logo,
+        .status-specific-location .logo,
+        .status-gone .logo {
+            filter: brightness(0) invert(1);
         }
         
         /* Status-specific colors */
@@ -331,11 +367,23 @@
             .status-option {
                 flex: 1 1 100%;
             }
+
+            .logo {
+                height: 60px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container" id="statusContainer">
+        <!-- Logo Container -->
+        <div class="logo-container">
+            <img src="https://i.ibb.co/M5JNf7pQ/images-Picsart-Background-Remover.png" 
+                 alt="SERE Logo" 
+                 class="logo"
+                 onerror="this.src='https://via.placeholder.com/300x80?text=Logo+Not+Loaded'">
+        </div>
+        
         <div class="status-icon" id="statusIcon">
             <i class="fas fa-home"></i>
         </div>
@@ -402,7 +450,7 @@
         </p>
 
         <button class="help-btn" id="helpBtn">
-            <i class="fas fa-question-circle"></i> Have A Question?
+            <i class="fas fa-question-circle"></i> Need Help?
         </button>
     </div>
 
@@ -487,7 +535,13 @@
             const status = data.currentStatus;
             const config = STATUS_CONFIG[status];
             
-            statusContainer.className = `container status-${status}`;
+            // First remove all status classes
+            statusContainer.className = 'container';
+            // Then add the specific status class
+            statusContainer.classList.add(`status-${status}`);
+            // Mark as loaded
+            statusContainer.classList.add('status-loaded');
+            
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
             statusText.textContent = `${formatStatusText(status)}`;
             statusMessage.textContent = config.message;
