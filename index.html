@@ -74,7 +74,7 @@
             max-width: 100%;
             object-fit: contain;
             transition: var(--transition);
-            filter: none !important; /* Force no filter by default */
+            filter: none !important;
         }
 
         /* White logo only on dark backgrounds */
@@ -123,6 +123,26 @@
             font-size: 1.1rem;
             margin: 1rem 0;
             opacity: 0.9;
+        }
+
+        /* Phone number styling */
+        .phone-number {
+            margin-top: 0.8rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .status-meeting .phone-number {
+            background: rgba(0, 0, 0, 0.08);
         }
         
         .change-btn {
@@ -494,7 +514,8 @@
             },
             'on-campus': {
                 message: "I'm on campus and available in cottage 12.",
-                icon: "fa-university"
+                icon: "fa-university",
+                phone: "Office #: 2347873"  // Added phone number here
             },
             'specific-location': {
                 message: "I'm somewhere on campus.",
@@ -544,7 +565,14 @@
             
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
             statusText.textContent = `${formatStatusText(status)}`;
-            statusMessage.textContent = config.message;
+            
+            // Update status message to include phone number if available
+            let messageHTML = config.message;
+            if (config.phone) {
+                messageHTML += `<div class="phone-number"><i class="fas fa-phone"></i> ${config.phone}</div>`;
+            }
+            statusMessage.innerHTML = messageHTML;
+            
             lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
         }
 
