@@ -7,18 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Initial logo hiding to prevent flash */
-        .logo {
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s 0.3s, opacity 0.3s ease;
-        }
-        .status-loaded .logo {
-            visibility: visible;
-            opacity: 1;
-        }
-    </style>
-    <style>
         :root {
             --off-campus: #ff6b6b;
             --on-campus: #51cf66;
@@ -61,11 +49,16 @@
             overflow: hidden;
         }
 
-        /* Logo Styles */
+        /* Logo Styles - Now acts as button */
         .logo-container {
             text-align: center;
             margin-bottom: 1rem;
-            padding: 0 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
         }
 
         .logo {
@@ -125,79 +118,61 @@
             opacity: 0.9;
         }
 
+        /* Action Buttons Container */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+
         /* Phone number styling */
         .phone-number {
-            margin-top: 0.8rem;
             font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             background: rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 10px 16px;
+            border-radius: 8px;
+            width: 100%;
+            transition: var(--transition);
         }
 
         .status-meeting .phone-number {
             background: rgba(0, 0, 0, 0.08);
         }
-        
-        .change-btn {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 500;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 1rem 0;
-            background: white;
-            color: var(--dark);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .change-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-        
-        .last-updated {
-            font-size: 0.85rem;
-            margin-top: 1.5rem;
-            opacity: 0.7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
 
         /* Help Button */
         .help-btn {
-            padding: 10px 16px;
-            font-size: 0.9rem;
+            padding: 12px 24px;
+            font-size: 1rem;
             border: none;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 1rem;
             background: rgba(255, 255, 255, 0.2);
             color: inherit;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             width: 100%;
-            justify-content: center;
         }
 
         .help-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+        }
+        
+        .last-updated {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         
         /* Login Form */
@@ -396,8 +371,8 @@
 </head>
 <body>
     <div class="container" id="statusContainer">
-        <!-- Logo Container -->
-        <div class="logo-container">
+        <!-- Logo Container - Now acts as change status button -->
+        <div class="logo-container" id="logoButton">
             <img src="https://i.ibb.co/M5JNf7pQ/images-Picsart-Background-Remover.png" 
                  alt="SERE Logo" 
                  class="logo"
@@ -410,9 +385,18 @@
         <h1 id="statusText">My Campus Status</h1>
         <div class="status-message" id="statusMessage">Loading...</div>
         
-        <button class="change-btn" id="changeStatusBtn">
-            <i class="fas fa-sync-alt"></i> Change Status
-        </button>
+        <!-- Action Buttons Container -->
+        <div class="action-buttons">
+            <!-- Phone number will appear here when on campus -->
+            <button class="help-btn" id="helpBtn">
+                <i class="fas fa-question-circle"></i> Need Help?
+            </button>
+        </div>
+        
+        <p class="last-updated">
+            <i class="far fa-clock"></i>
+            <span id="lastUpdated"></span>
+        </p>
         
         <div id="authSection" style="display: none;">
             <div class="login-form" id="loginForm">
@@ -463,15 +447,6 @@
                 Gone for the Day
             </button>
         </div>
-        
-        <p class="last-updated">
-            <i class="far fa-clock"></i>
-            <span id="lastUpdated"></span>
-        </p>
-
-        <button class="help-btn" id="helpBtn">
-            <i class="fas fa-question-circle"></i> Need Help?
-        </button>
     </div>
 
     <script type="module">
@@ -515,7 +490,7 @@
             'on-campus': {
                 message: "I'm on campus and available in cottage 12.",
                 icon: "fa-university",
-                phone: "Office #: 2347873"  // Added phone number here
+                phone: "Office # 2347873"
             },
             'specific-location': {
                 message: "I'm somewhere on campus.",
@@ -536,7 +511,8 @@
         const statusIcon = document.getElementById('statusIcon');
         const statusText = document.getElementById('statusText');
         const statusMessage = document.getElementById('statusMessage');
-        const changeStatusBtn = document.getElementById('changeStatusBtn');
+        const logoButton = document.getElementById('logoButton');
+        const actionButtons = document.querySelector('.action-buttons');
         const lastUpdated = document.getElementById('lastUpdated');
         const authSection = document.getElementById('authSection');
         const loginForm = document.getElementById('loginForm');
@@ -560,20 +536,31 @@
             statusContainer.className = 'container';
             // Then add the specific status class
             statusContainer.classList.add(`status-${status}`);
-            // Mark as loaded
-            statusContainer.classList.add('status-loaded');
             
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
             statusText.textContent = `${formatStatusText(status)}`;
-            
-            // Update status message to include phone number if available
-            let messageHTML = config.message;
-            if (config.phone) {
-                messageHTML += `<div class="phone-number"><i class="fas fa-phone"></i> ${config.phone}</div>`;
-            }
-            statusMessage.innerHTML = messageHTML;
-            
+            statusMessage.textContent = config.message;
             lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
+
+            // Update phone number display
+            updatePhoneNumberDisplay(status);
+        }
+
+        // Update phone number display
+        function updatePhoneNumberDisplay(status) {
+            // Remove any existing phone number element
+            const existingPhone = document.querySelector('.phone-number');
+            if (existingPhone) {
+                existingPhone.remove();
+            }
+
+            // Add phone number if on-campus
+            if (status === 'on-campus') {
+                const phoneDiv = document.createElement('div');
+                phoneDiv.className = 'phone-number';
+                phoneDiv.innerHTML = `<i class="fas fa-phone"></i> Office: 2347873`;
+                actionButtons.insertBefore(phoneDiv, helpBtn);
+            }
         }
 
         // Format status text for display
@@ -611,28 +598,24 @@
                 userEmail.textContent = user.email;
                 loginForm.style.display = 'none';
                 authSection.style.display = 'none';
-                changeStatusBtn.style.display = 'inline-block';
             } else {
                 // User is signed out
                 userInfo.style.display = 'none';
                 loginForm.style.display = 'none';
                 statusOptions.style.display = 'none';
-                changeStatusBtn.style.display = 'inline-block';
                 authSection.style.display = 'none';
             }
         });
 
-        // Change Status button click handler
-        changeStatusBtn.addEventListener('click', () => {
+        // Logo button click handler (replaces change status button)
+        logoButton.addEventListener('click', () => {
             if (auth.currentUser) {
                 // User is already logged in - show status options directly
                 statusOptions.style.display = 'flex';
-                changeStatusBtn.style.display = 'none';
             } else {
                 // User needs to log in
                 authSection.style.display = 'block';
                 loginForm.style.display = 'block';
-                changeStatusBtn.style.display = 'none';
                 emailInput.focus();
             }
         });
@@ -641,7 +624,6 @@
         cancelLoginBtn.addEventListener('click', () => {
             authSection.style.display = 'none';
             loginForm.style.display = 'none';
-            changeStatusBtn.style.display = 'inline-block';
             loginError.textContent = '';
             emailInput.value = '';
             loginPassword.value = '';
@@ -658,7 +640,6 @@
                 // On successful login, show status options
                 statusOptions.style.display = 'flex';
                 authSection.style.display = 'none';
-                changeStatusBtn.style.display = 'none';
             } catch (error) {
                 loginError.textContent = getErrorMessage(error.code);
                 loginPassword.value = '';
@@ -693,7 +674,6 @@
                 const newStatus = this.getAttribute('data-status');
                 saveStatus(newStatus);
                 statusOptions.style.display = 'none';
-                changeStatusBtn.style.display = 'inline-block';
             });
         });
 
