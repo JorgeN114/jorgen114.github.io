@@ -436,7 +436,7 @@
             </button>
             <button class="status-option" data-status="specific-location">
                 <i class="fas fa-map-marker-alt"></i>
-                Somewhere on Campus
+                At SERE
             </button>
             <button class="status-option" data-status="meeting">
                 <i class="fas fa-users"></i>
@@ -493,7 +493,7 @@
                 phone: "Office # 2347873"
             },
             'specific-location': {
-                message: "I'm somewhere on campus.",
+                message: "Somewhere on campus",
                 icon: "fa-map-marker-alt"
             },
             'meeting': {
@@ -565,6 +565,9 @@
 
         // Format status text for display
         function formatStatusText(status) {
+            if (status === 'specific-location') {
+                return 'At SERE';
+            }
             return status.split('-').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
