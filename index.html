@@ -13,6 +13,7 @@
             --specific-location: #339af0;
             --meeting: #fcc419;
             --gone: #868e96;
+            --vacation: #9c36b5;
             --dark: #2c3e50;
             --light: #f8f9fa;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -74,7 +75,8 @@
         .status-off-campus .logo,
         .status-on-campus .logo,
         .status-specific-location .logo,
-        .status-gone .logo {
+        .status-gone .logo,
+        .status-vacation .logo {
             filter: brightness(0) invert(1);
         }
         
@@ -99,6 +101,10 @@
             background: linear-gradient(135deg, var(--gone), #adb5bd); 
             color: white; 
         }
+        .status-vacation { 
+            background: linear-gradient(135deg, var(--vacation), #cc5de8); 
+            color: white; 
+        }
         
         .status-icon {
             font-size: 3rem;
@@ -116,6 +122,23 @@
             font-size: 1.1rem;
             margin: 1rem 0;
             opacity: 0.9;
+        }
+
+        /* Help desk message styling */
+        .help-desk-message {
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #cc5de8;
+            display: none;
+        }
+
+        .status-vacation .help-desk-message {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #cc5de8;
         }
 
         /* Action Buttons Container */
@@ -261,8 +284,6 @@
             flex-direction: column;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
         }
         
         /* Status option styles */
@@ -296,6 +317,12 @@
             border: 1px solid #dee2e6;
         }
         
+        .status-option[data-status="vacation"] {
+            background: linear-gradient(135deg, #f3d9fa, #eebefa);
+            color: #862e9c;
+            border: 1px solid #e599f7;
+        }
+        
         .status-option:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -312,6 +339,7 @@
         .status-option[data-status="specific-location"] i { color: #339af0; }
         .status-option[data-status="meeting"] i { color: #fcc419; }
         .status-option[data-status="gone"] i { color: #868e96; }
+        .status-option[data-status="vacation"] i { color: #9c36b5; }
         
         /* User info section */
         .user-info {
@@ -385,6 +413,11 @@
         <h1 id="statusText">My Campus Status</h1>
         <div class="status-message" id="statusMessage">Loading...</div>
         
+        <!-- Help Desk Message -->
+        <div class="help-desk-message" id="helpDeskMessage">
+            If you have any issues, please put in a Help Desk ticket and someone will come and help you.
+        </div>
+        
         <!-- Action Buttons Container -->
         <div class="action-buttons">
             <!-- Phone number will appear here when on campus -->
@@ -446,6 +479,10 @@
                 <i class="fas fa-moon"></i>
                 Gone for the Day
             </button>
+            <button class="status-option" data-status="vacation">
+                <i class="fas fa-umbrella-beach"></i>
+                On Vacation
+            </button>
         </div>
     </div>
 
@@ -488,7 +525,7 @@
                 icon: "fa-home"
             },
             'on-campus': {
-                message: "I'm on campus and available on the last cottage on the right.",
+                message: "I'm on campus and available in cottage 12.",
                 icon: "fa-university",
                 phone: "Office # 2347873"
             },
@@ -503,6 +540,10 @@
             'gone': {
                 message: "I've left SERE for the day.",
                 icon: "fa-moon"
+            },
+            'vacation': {
+                message: "I'm on vacation and will return on [return date].",
+                icon: "fa-umbrella-beach"
             }
         };
 
@@ -511,6 +552,7 @@
         const statusIcon = document.getElementById('statusIcon');
         const statusText = document.getElementById('statusText');
         const statusMessage = document.getElementById('statusMessage');
+        const helpDeskMessage = document.getElementById('helpDeskMessage');
         const logoButton = document.getElementById('logoButton');
         const actionButtons = document.querySelector('.action-buttons');
         const lastUpdated = document.getElementById('lastUpdated');
@@ -529,7 +571,7 @@
 
         // Update the display based on current status
         function updateDisplay(data) {
-            const status = data.currentStatus;
+            const status = data.currentStatus || 'off-campus';
             const config = STATUS_CONFIG[status];
             
             // First remove all status classes
@@ -539,8 +581,24 @@
             
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
             statusText.textContent = `${formatStatusText(status)}`;
-            statusMessage.textContent = config.message;
-            lastUpdated.textContent = `Last updated: ${data.lastUpdated}`;
+            
+            // Custom message handling for vacation status
+            let displayMessage = config.message;
+            if (status === 'vacation' && data.returnDate) {
+                displayMessage = displayMessage.replace('[return date]', data.returnDate);
+            } else if (status === 'vacation') {
+                displayMessage = displayMessage.replace('[return date]', 'a future date');
+            }
+            
+            statusMessage.textContent = displayMessage;
+            lastUpdated.textContent = `Last updated: ${data.lastUpdated || new Date().toLocaleString()}`;
+
+            // Show help desk message only for vacation status
+            if (status === 'vacation') {
+                helpDeskMessage.style.display = 'block';
+            } else {
+                helpDeskMessage.style.display = 'none';
+            }
 
             // Update phone number display
             updatePhoneNumberDisplay(status);
@@ -577,20 +635,44 @@
         function loadStatus() {
             const statusRef = ref(database, 'status');
             onValue(statusRef, (snapshot) => {
-                const data = snapshot.val() || { 
+                const data = snapshot.val();
+                if (data) {
+                    updateDisplay(data);
+                } else {
+                    // Set default status if none exists
+                    const defaultData = { 
+                        currentStatus: 'off-campus', 
+                        lastUpdated: new Date().toLocaleString() 
+                    };
+                    updateDisplay(defaultData);
+                }
+            }, (error) => {
+                // Handle error by showing default status
+                console.error('Error loading status:', error);
+                const defaultData = { 
                     currentStatus: 'off-campus', 
                     lastUpdated: new Date().toLocaleString() 
                 };
-                updateDisplay(data);
+                updateDisplay(defaultData);
             });
         }
 
         // Save status to Firebase
         function saveStatus(status) {
-            set(ref(database, 'status'), {
+            let statusData = {
                 currentStatus: status,
                 lastUpdated: new Date().toLocaleString()
-            });
+            };
+
+            // If vacation status, prompt for return date
+            if (status === 'vacation') {
+                const returnDate = prompt('When will you return from vacation? (e.g., "Monday, Jan 15")');
+                if (returnDate) {
+                    statusData.returnDate = returnDate;
+                }
+            }
+
+            set(ref(database, 'status'), statusData);
         }
 
         // Authentication state handler
