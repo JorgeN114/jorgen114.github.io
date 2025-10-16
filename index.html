@@ -13,7 +13,7 @@
             --specific-location: #339af0;
             --meeting: #fcc419;
             --gone: #868e96;
-            --vacation: #9c36b5;
+            --vacation: #ff6b35;
             --dark: #2c3e50;
             --light: #f8f9fa;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -102,8 +102,26 @@
             color: white; 
         }
         .status-vacation { 
-            background: linear-gradient(135deg, var(--vacation), #cc5de8); 
-            color: white; 
+            background: linear-gradient(135deg, var(--vacation), #ff8e58);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Disney Halloween themed elements for vacation */
+        .status-vacation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.1) 2px, transparent 2px);
+            background-size: 50px 50px;
+            pointer-events: none;
         }
         
         .status-icon {
@@ -132,13 +150,13 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             text-align: center;
-            border-left: 4px solid #cc5de8;
+            border-left: 4px solid #ffd700;
             display: none;
         }
 
         .status-vacation .help-desk-message {
             background: rgba(0, 0, 0, 0.2);
-            border-left: 4px solid #cc5de8;
+            border-left: 4px solid #ff8e58;
         }
 
         /* Action Buttons Container */
@@ -284,6 +302,8 @@
             flex-direction: column;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
         
         /* Status option styles */
@@ -318,9 +338,29 @@
         }
         
         .status-option[data-status="vacation"] {
-            background: linear-gradient(135deg, #f3d9fa, #eebefa);
-            color: #862e9c;
-            border: 1px solid #e599f7;
+            background: linear-gradient(135deg, #ff6b35, #ff8e58);
+            color: white;
+            border: 2px solid #ffd700;
+        }
+        
+        /* Disney Halloween sparkle effect for vacation option */
+        .status-option[data-status="vacation"]::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 215, 0, 0.2),
+                transparent,
+                rgba(255, 215, 0, 0.2),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: sparkle 2s infinite;
         }
         
         .status-option:hover {
@@ -339,7 +379,10 @@
         .status-option[data-status="specific-location"] i { color: #339af0; }
         .status-option[data-status="meeting"] i { color: #fcc419; }
         .status-option[data-status="gone"] i { color: #868e96; }
-        .status-option[data-status="vacation"] i { color: #9c36b5; }
+        .status-option[data-status="vacation"] i { 
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
         
         /* User info section */
         .user-info {
@@ -377,6 +420,12 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+        
+        @keyframes sparkle {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
         }
         
         /* Responsive */
@@ -480,7 +529,7 @@
                 Gone for the Day
             </button>
             <button class="status-option" data-status="vacation">
-                <i class="fas fa-umbrella-beach"></i>
+                <i class="fas fa-hat-wizard"></i>
                 On Vacation
             </button>
         </div>
@@ -525,7 +574,7 @@
                 icon: "fa-home"
             },
             'on-campus': {
-                message: "I'm on campus and available in the last cottage on the right.",
+                message: "I'm on campus and available in cottage 12.",
                 icon: "fa-university",
                 phone: "Office # 2347873"
             },
@@ -543,7 +592,7 @@
             },
             'vacation': {
                 message: "I'm on vacation and will return on [return date].",
-                icon: "fa-umbrella-beach"
+                icon: "fa-hat-wizard"
             }
         };
 
@@ -675,7 +724,7 @@
             set(ref(database, 'status'), statusData);
         }
 
-        // Authentication state handler
+        // Authentication state handler - FIXED THE SYNTAX ERROR HERE
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in
