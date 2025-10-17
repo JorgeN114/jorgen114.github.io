@@ -68,16 +68,17 @@
             max-width: 100%;
             object-fit: contain;
             transition: var(--transition);
-            filter: none !important;
         }
 
-        /* White logo only on dark backgrounds */
-        .status-off-campus .logo,
-        .status-on-campus .logo,
-        .status-specific-location .logo,
-        .status-gone .logo,
-        .status-vacation .logo {
-            filter: brightness(0) invert(1);
+        /* Make vacation logo specifically larger */
+        .vacation-logo {
+            height: 100px !important;
+            max-width: 90% !important;
+        }
+
+        /* Remove all white filter effects - show logos in original colors */
+        .logo {
+            filter: none !important;
         }
         
         /* Status-specific colors */
@@ -443,6 +444,10 @@
             .logo {
                 height: 60px;
             }
+            
+            .vacation-logo {
+                height: 70px !important;
+            }
         }
     </style>
 </head>
@@ -453,6 +458,7 @@
             <img src="https://i.ibb.co/M5JNf7pQ/images-Picsart-Background-Remover.png" 
                  alt="SERE Logo" 
                  class="logo"
+                 id="mainLogo"
                  onerror="this.src='https://via.placeholder.com/300x80?text=Logo+Not+Loaded'">
         </div>
         
@@ -603,6 +609,7 @@
         const statusMessage = document.getElementById('statusMessage');
         const helpDeskMessage = document.getElementById('helpDeskMessage');
         const logoButton = document.getElementById('logoButton');
+        const mainLogo = document.getElementById('mainLogo');
         const actionButtons = document.querySelector('.action-buttons');
         const lastUpdated = document.getElementById('lastUpdated');
         const authSection = document.getElementById('authSection');
@@ -627,6 +634,15 @@
             statusContainer.className = 'container';
             // Then add the specific status class
             statusContainer.classList.add(`status-${status}`);
+            
+            // Update logo based on status
+            if (status === 'vacation') {
+                mainLogo.src = 'https://i.ibb.co/JWrpNSCP/Chat-GPT-Image-Oct-16-2025-02-25-27-PM.png';
+                mainLogo.classList.add('vacation-logo');
+            } else {
+                mainLogo.src = 'https://i.ibb.co/M5JNf7pQ/images-Picsart-Background-Remover.png';
+                mainLogo.classList.remove('vacation-logo');
+            }
             
             statusIcon.innerHTML = `<i class="fas ${config.icon}"></i>`;
             statusText.textContent = `${formatStatusText(status)}`;
@@ -724,7 +740,7 @@
             set(ref(database, 'status'), statusData);
         }
 
-        // Authentication state handler - FIXED THE SYNTAX ERROR HERE
+        // Authentication state handler
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in
